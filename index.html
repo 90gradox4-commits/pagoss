@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>Control de pagos · Primera Comunión</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#172033;--muted:#697386;--line:#e6eaf1;--green:#15803d;--greenbg:#dcfce7;--red:#b91c1c;--redbg:#fee2e2;--amber:#92400e;--amberbg:#fef3c7;--blue:#3346a8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
+header{background:linear-gradient(135deg,#111827,#27365b);color:white;padding:28px 18px 24px;border-radius:0 0 26px 26px}
+.wrap{max-width:900px;margin:auto} .eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#c7d2fe;font-weight:700}
+h1{font-size:26px;line-height:1.12;margin:8px 0 8px}header p{margin:0;color:#d8deeb;font-size:14px}
+main{padding:16px;max-width:900px;margin:auto}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:-2px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 11px;box-shadow:0 4px 15px #17203308}
+.stat .label{font-size:11px;color:var(--muted);margin-bottom:7px}.stat .num{font-weight:800;font-size:21px;letter-spacing:-.5px}.stat .sub{font-size:11px;color:var(--muted);margin-top:4px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:0 4px 15px #17203308}
+.searchbox{display:flex;align-items:center;gap:10px;border:1.5px solid #dbe1ed;border-radius:13px;padding:0 13px;background:#fbfcff}
+.searchbox span{font-size:20px;color:#667085}.searchbox input{border:0;outline:0;background:transparent;width:100%;padding:14px 0;font-size:16px;color:var(--ink)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.filter{border:1px solid var(--line);border-radius:999px;background:white;color:#475467;padding:9px 12px;font-size:12px;font-weight:700}
+.filter.active{background:#172033;color:white;border-color:#172033}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.btn{border:0;border-radius:11px;padding:11px 13px;font-weight:700;font-size:12px;background:#eef2ff;color:#293b93}.btn.dark{background:#172033;color:#fff}.btn.light{background:#f3f4f6;color:#374151}
+.resultshead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 2px 10px}.resultshead h2{font-size:16px;margin:0}.count{font-size:12px;color:var(--muted)}
+.person{background:white;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px;box-shadow:0 3px 12px #17203305}
+.person-top{display:flex;align-items:flex-start;gap:10px}.number{width:34px;height:34px;flex:0 0 34px;border-radius:11px;background:#eef2ff;color:#3446a5;display:grid;place-items:center;font-weight:800;font-size:13px}
+.details{min-width:0;flex:1}.student{font-size:16px;font-weight:800;line-height:1.25;margin:0 0 5px;overflow-wrap:anywhere}.parent{font-size:13px;color:#596579;line-height:1.35;overflow-wrap:anywhere}.group{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.4px;color:#53617a;background:#f1f4f9;border-radius:6px;padding:4px 6px;margin-top:8px}
+.status{white-space:nowrap;font-size:11px;font-weight:800;border-radius:999px;padding:7px 9px}.status.paid{background:var(--greenbg);color:var(--green)}.status.unpaid{background:var(--redbg);color:var(--red)}.status.unknown{background:var(--amberbg);color:var(--amber)}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid #f0f2f6;margin-top:12px;padding-top:10px;flex-wrap:wrap}.phone{font-size:13px;color:#596579;overflow-wrap:anywhere}.amount{font-size:14px;font-weight:800}.amount.muted{color:#9ca3af}.actions{display:flex;gap:7px;margin-top:11px}.actions button{flex:1;border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 7px;font-size:12px;font-weight:700;color:#344054}
+.empty{text-align:center;padding:30px 15px;color:var(--muted)}.note{font-size:11px;color:var(--muted);line-height:1.5;text-align:center;padding:8px 10px 22px}
+dialog{border:0;border-radius:18px;padding:0;width:calc(100% - 28px);max-width:480px;box-shadow:0 20px 80px #0003}dialog::backdrop{background:#10182899}.modal{padding:20px}.modal h2{margin:0 0 16px;font-size:20px}.field{display:block;margin:12px 0}.field span{display:block;font-size:12px;font-weight:700;color:#596579;margin-bottom:6px}.field input,.field select{width:100%;padding:12px;border:1px solid #d5dbe6;border-radius:10px;font-size:15px;background:white}.modal-actions{display:flex;gap:8px;margin-top:18px}.modal-actions button{flex:1}
+@media(min-width:650px){h1{font-size:32px}.list{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}.person{margin-bottom:0}.stat .num{font-size:25px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="eyebrow">Administración · Primera Comunión</div><h1>Control de pagos</h1><p>Busca por nombre, apellido o WhatsApp y verifica el estado de cada estudiante.</p></div></header>
+<main>
+<section class="stats">
+<div class="stat"><div class="label">ESTUDIANTES</div><div class="num" id="total">0</div><div class="sub">Registros guardados</div></div>
+<div class="stat"><div class="label">PAGADOS</div><div class="num" id="paid">0</div><div class="sub" id="paidmoney">$0 COP recaudados</div></div>
+<div class="stat"><div class="label">PENDIENTES</div><div class="num" id="pending">0</div><div class="sub" id="pendingmoney">$0 COP por cobrar</div></div>
+</section>
+<section class="panel">
+<div class="searchbox"><span>⌕</span><input id="search" type="search" placeholder="Escribe un nombre, apellido o WhatsApp…" autocomplete="off"></div>
+<div class="filters" id="filters">
+<button class="filter active" data-filter="all">Todos</button><button class="filter" data-filter="paid">Pagaron</button><button class="filter" data-filter="unpaid">No pagaron</button><button class="filter" data-filter="unknown">Por verificar</button>
+</div>
+<div class="toolbar"><button class="btn dark" id="addBtn">＋ Agregar estudiante</button><button class="btn" id="exportBtn">Exportar CSV</button><button class="btn light" id="resetBtn">Restaurar datos iniciales</button></div>
+</section>
+<div class="resultshead"><h2>Listado de estudiantes</h2><span class="count" id="resultCount"></span></div>
+<section class="list" id="list">
+<article class="person">
+ <div class="person-top"><div class="number">1</div><div class="details"><p class="student">shantal chiquinquirá</p><div class="parent">Acudiente: Mariannys Echegaray</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 311 3775097</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">2</div><div class="details"><p class="student">Yaraima García Alvarado</p><div class="parent">Acudiente: Jadith Alvarado Salazar</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 312 6777195</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">3</div><div class="details"><p class="student">jisela Isabel</p><div class="parent">Acudiente: Jennifer Márquez</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3113690998</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">4</div><div class="details"><p class="student">Isabel Quiñones Moreno</p><div class="parent">Acudiente: Martha Moreno</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 313 5618139</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">5</div><div class="details"><p class="student">maría victoria mendez</p><div class="parent">Acudiente: Katherine cliente</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 321 6862867</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">6</div><div class="details"><p class="student">Mishell dayana orozco</p><div class="parent">Acudiente: Daniela pallares blanco</div><span class="group">Listado 1</span></div><span class="status unpaid">NO PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ Sin número registrado</div><div class="amount muted">Debe $35.000</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">7</div><div class="details"><p class="student">paula Andrea carvajaI</p><div class="parent">Acudiente: maría paula arango</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3106400257</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">8</div><div class="details"><p class="student">Luciana isabel</p><div class="parent">Acudiente: Dayana Vergara</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3127647519</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">9</div><div class="details"><p class="student">narieth Pérez rojas</p><div class="parent">Acudiente: Eliana rojas Jiménez</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3216970350</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">10</div><div class="details"><p class="student">jhoandris milena perez</p><div class="parent">Acudiente: ana palomino</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3148294680</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">11</div><div class="details"><p class="student">Ana Lorena Beleño</p><div class="parent">Acudiente: ana palomino</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3148294680</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">12</div><div class="details"><p class="student">Krisbell Barahona</p><div class="parent">Acudiente: Erika Tinoco</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3126763140</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">13</div><div class="details"><p class="student">Luciana Jireth Pinzón</p><div class="parent">Acudiente: Jahel Tatiana Pallares</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 304-253 6150</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">14</div><div class="details"><p class="student">Sara Sofía Martínez</p><div class="parent">Acudiente: Leidy Rangel García</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 318 4584564</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">15</div><div class="details"><p class="student">Mercy lilians</p><div class="parent">Acudiente: marinela jose ig</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 314 4783651</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">16</div><div class="details"><p class="student">Milagros Restrepo ostia</p><div class="parent">Acudiente: MARCELA OSTIA</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 317 2641586</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">17</div><div class="details"><p class="student">Mari yiseth Navarro</p><div class="parent">Acudiente: Adaluz De ángel</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 321 9514465</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">18</div><div class="details"><p class="student">Alisson Carolina difilipo</p><div class="parent">Acudiente: Astrid Carolina beleño florez</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3153731670</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">19</div><div class="details"><p class="student">La niña Aleshka Colmenares</p><div class="parent">Acudiente: Cindy Gutiérrez</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 314 3761629</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">20</div><div class="details"><p class="student">Salome castro fonseca</p><div class="parent">Acudiente: emili rous peluqueria</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3113133176</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">21</div><div class="details"><p class="student">Karla Maria Hernandez</p><div class="parent">Acudiente: Valentina Isabel Mendoza</div><span class="group">Listado 1</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3185547245</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">2</div><div class="details"><p class="student">Ana Lucía Florez</p><div class="parent">Acudiente: Yolanda Rojas</div><span class="group">Listado 2</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3152246759</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">3</div><div class="details"><p class="student">Thayle Camacho Hernández</p><div class="parent">Acudiente: Laura Hernández Fragoso</div><span class="group">Listado 2</span></div><span class="status unpaid">NO PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 318 7558404</div><div class="amount muted">Debe $35.000</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">4</div><div class="details"><p class="student">María Victoria rojas</p><div class="parent">Acudiente: Zaira Fonseca</div><span class="group">Listado 2</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3147095392</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">5</div><div class="details"><p class="student">angelly Morales pineda</p><div class="parent">Acudiente: kely Pineda gracia</div><span class="group">Listado 2</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3113317498</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">6</div><div class="details"><p class="student">Antonela Díaz Fonseca</p><div class="parent">Acudiente: Ramona Fonseca Machado</div><span class="group">Listado 2</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3136629931</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">7</div><div class="details"><p class="student">Dulce María mojica Salazar</p><div class="parent">Acudiente: Leydis Salazar oyola</div><span class="group">Listado 2</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 314 8927850</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">8</div><div class="details"><p class="student">eneri bustos</p><div class="parent">Acudiente: Sara ditta</div><span class="group">Listado 2</span></div><span class="status unpaid">NO PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3235360090</div><div class="amount muted">Debe $35.000</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">9</div><div class="details"><p class="student">nannys flores</p><div class="parent">Acudiente: Ariadna gutierrez</div><span class="group">Listado 2</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3114271654</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">10</div><div class="details"><p class="student">alisson difilipo</p><div class="parent">Acudiente: Astrid beleño</div><span class="group">Listado 2</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3153731670</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">11</div><div class="details"><p class="student">thamara fragoso</p><div class="parent">Acudiente: Ana quiceno</div><span class="group">Listado 2</span></div><span class="status unknown">POR VERIFICAR</span></div>
+ <div class="meta"><div class="phone">☎ 3216347809</div><div class="amount muted">$35.000 por confirmar</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">12</div><div class="details"><p class="student">carla gelves</p><div class="parent">Acudiente: marianela cliente</div><span class="group">Listado 2</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3216274531</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">13</div><div class="details"><p class="student">Gisela leal</p><div class="parent">Acudiente: Heider leal</div><span class="group">Listado 2</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3128098457</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">14</div><div class="details"><p class="student">ashley celeste velez</p><div class="parent">Acudiente: estefani villa carla</div><span class="group">Listado 2</span></div><span class="status unpaid">NO PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 310 6922508</div><div class="amount muted">Debe $35.000</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">15</div><div class="details"><p class="student">brianna camila martinez</p><div class="parent">Acudiente: Karol vides</div><span class="group">Listado 2</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3178413780</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">16</div><div class="details"><p class="student">yina celis</p><div class="parent">Acudiente: paola celis</div><span class="group">Listado 2</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3153124252</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">17</div><div class="details"><p class="student">dayana isabela</p><div class="parent">Acudiente: tatiana ivan orta</div><span class="group">Listado 2</span></div><span class="status unpaid">NO PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3116910294</div><div class="amount muted">Debe $35.000</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">18</div><div class="details"><p class="student">Yulive surmay</p><div class="parent">Acudiente: Kattlyn yulieth redondo</div><span class="group">Listado 2</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3135354157</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">19</div><div class="details"><p class="student">Samanta Padro celis</p><div class="parent">Acudiente: Yinia Celis Rios</div><span class="group">Listado 2</span></div><span class="status unpaid">NO PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 3153124252</div><div class="amount muted">Debe $35.000</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">20</div><div class="details"><p class="student">Briana Díaz</p><div class="parent">Acudiente: sol ángel bohorquez</div><span class="group">Listado 2</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 323 5703565</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+<article class="person">
+ <div class="person-top"><div class="number">21</div><div class="details"><p class="student">lorielys liliana chacon</p><div class="parent">Acudiente: Lilia jimenez</div><span class="group">Listado 2</span></div><span class="status paid">PAGADO</span></div>
+ <div class="meta"><div class="phone">☎ 301 3499921</div><div class="amount ">$35.000 COP</div></div>
+ </article>
+</section>
+<div class="note">Si solo ves el listado sin funcionar el buscador, abre este archivo en Safari (no en la vista previa de Archivos). Los cambios se guardan en este navegador del dispositivo. Para conservarlos al cambiar de teléfono o navegador, usa “Exportar CSV” como copia de seguridad.</div>
+</main>
+<dialog id="editDialog"><form class="modal" id="studentForm"><h2 id="dialogTitle">Agregar estudiante</h2><input type="hidden" id="editId">
+<label class="field"><span>Nombre del estudiante</span><input id="fStudent" required></label>
+<label class="field"><span>Nombre del papá, mamá o acudiente</span><input id="fParent" required></label>
+<label class="field"><span>WhatsApp</span><input id="fPhone" inputmode="tel"></label>
+<label class="field"><span>Grupo / listado</span><select id="fGroup"><option value="Listado 1">Listado 1</option><option value="Listado 2">Listado 2</option></select></label>
+<label class="field"><span>Estado del pago</span><select id="fStatus"><option value="paid">Pagado</option><option value="unpaid">No pagado</option><option value="unknown">Por verificar</option></select></label>
+<div class="modal-actions"><button type="button" class="btn light" id="cancelBtn">Cancelar</button><button type="submit" class="btn dark">Guardar</button></div></form></dialog>
+<script>
+const initial = [
+{id:'a1',n:1,parent:'Mariannys Echegaray',student:'shantal chiquinquirá',phone:'311 3775097',group:'Listado 1',status:'paid'},
+{id:'a2',n:2,parent:'Jadith Alvarado Salazar',student:'Yaraima García Alvarado',phone:'312 6777195',group:'Listado 1',status:'paid'},
+{id:'a3',n:3,parent:'Jennifer Márquez',student:'jisela Isabel',phone:'3113690998',group:'Listado 1',status:'paid'},
+{id:'a4',n:4,parent:'Martha Moreno',student:'Isabel Quiñones Moreno',phone:'313 5618139',group:'Listado 1',status:'paid'},
+{id:'a5',n:5,parent:'Katherine cliente',student:'maría victoria mendez',phone:'321 6862867',group:'Listado 1',status:'paid'},
+{id:'a6',n:6,parent:'Daniela pallares blanco',student:'Mishell dayana orozco',phone:'',group:'Listado 1',status:'unpaid'},
+{id:'a7',n:7,parent:'maría paula arango',student:'paula Andrea carvajaI',phone:'3106400257',group:'Listado 1',status:'paid'},
+{id:'a8',n:8,parent:'Dayana Vergara',student:'Luciana isabel',phone:'3127647519',group:'Listado 1',status:'paid'},
+{id:'a9',n:9,parent:'Eliana rojas Jiménez',student:'narieth Pérez rojas',phone:'3216970350',group:'Listado 1',status:'paid'},
+{id:'a10',n:10,parent:'ana palomino',student:'jhoandris milena perez',phone:'3148294680',group:'Listado 1',status:'paid'},
+{id:'a11',n:11,parent:'ana palomino',student:'Ana Lorena Beleño',phone:'3148294680',group:'Listado 1',status:'paid'},
+{id:'a12',n:12,parent:'Erika Tinoco',student:'Krisbell Barahona',phone:'3126763140',group:'Listado 1',status:'paid'},
+{id:'a13',n:13,parent:'Jahel Tatiana Pallares',student:'Luciana Jireth Pinzón',phone:'304-253 6150',group:'Listado 1',status:'paid'},
+{id:'a14',n:14,parent:'Leidy Rangel García',student:'Sara Sofía Martínez',phone:'318 4584564',group:'Listado 1',status:'paid'},
+{id:'a15',n:15,parent:'marinela jose ig',student:'Mercy lilians',phone:'314 4783651',group:'Listado 1',status:'paid'},
+{id:'a16',n:16,parent:'MARCELA OSTIA',student:'Milagros Restrepo ostia',phone:'317 2641586',group:'Listado 1',status:'paid'},
+{id:'a17',n:17,parent:'Adaluz De ángel',student:'Mari yiseth Navarro',phone:'321 9514465',group:'Listado 1',status:'paid'},
+{id:'a18',n:18,parent:'Astrid Carolina beleño florez',student:'Alisson Carolina difilipo',phone:'3153731670',group:'Listado 1',status:'paid'},
+{id:'a19',n:19,parent:'Cindy Gutiérrez',student:'La niña Aleshka Colmenares',phone:'314 3761629',group:'Listado 1',status:'paid'},
+{id:'a20',n:20,parent:'emili rous peluqueria',student:'Salome castro fonseca',phone:'3113133176',group:'Listado 1',status:'paid'},
+{id:'a21',n:21,parent:'Valentina Isabel Mendoza',student:'Karla Maria Hernandez',phone:'3185547245',group:'Listado 1',status:'paid'},
+{id:'b2',n:2,parent:'Yolanda Rojas',student:'Ana Lucía Florez',phone:'3152246759',group:'Listado 2',status:'paid'},
+{id:'b3',n:3,parent:'Laura Hernández Fragoso',student:'Thayle Camacho Hernández',phone:'318 7558404',group:'Listado 2',status:'unpaid'},
+{id:'b4',n:4,parent:'Zaira Fonseca',student:'María Victoria rojas',phone:'3147095392',group:'Listado 2',status:'paid'},
+{id:'b5',n:5,parent:'kely Pineda gracia',student:'angelly Morales pineda',phone:'3113317498',group:'Listado 2',status:'paid'},
+{id:'b6',n:6,parent:'Ramona Fonseca Machado',student:'Antonela Díaz Fonseca',phone:'3136629931',group:'Listado 2',status:'paid'},
+{id:'b7',n:7,parent:'Leydis Salazar oyola',student:'Dulce María mojica Salazar',phone:'314 8927850',group:'Listado 2',status:'paid'},
+{id:'b8',n:8,parent:'Sara ditta',student:'eneri bustos',phone:'3235360090',group:'Listado 2',status:'unpaid'},
+{id:'b9',n:9,parent:'Ariadna gutierrez',student:'nannys flores',phone:'3114271654',group:'Listado 2',status:'paid'},
+{id:'b10',n:10,parent:'Astrid beleño',student:'alisson difilipo',phone:'3153731670',group:'Listado 2',status:'paid'},
+{id:'b11',n:11,parent:'Ana quiceno',student:'thamara fragoso',phone:'3216347809',group:'Listado 2',status:'unknown'},
+{id:'b12',n:12,parent:'marianela cliente',student:'carla gelves',phone:'3216274531',group:'Listado 2',status:'paid'},
+{id:'b13',n:13,parent:'Heider leal',student:'Gisela leal',phone:'3128098457',group:'Listado 2',status:'paid'},
+{id:'b14',n:14,parent:'estefani villa carla',student:'ashley celeste velez',phone:'310 6922508',group:'Listado 2',status:'unpaid'},
+{id:'b15',n:15,parent:'Karol vides',student:'brianna camila martinez',phone:'3178413780',group:'Listado 2',status:'paid'},
+{id:'b16',n:16,parent:'paola celis',student:'yina celis',phone:'3153124252',group:'Listado 2',status:'paid'},
+{id:'b17',n:17,parent:'tatiana ivan orta',student:'dayana isabela',phone:'3116910294',group:'Listado 2',status:'unpaid'},
+{id:'b18',n:18,parent:'Kattlyn yulieth redondo',student:'Yulive surmay',phone:'3135354157',group:'Listado 2',status:'paid'},
+{id:'b19',n:19,parent:'Yinia Celis Rios',student:'Samanta Padro celis',phone:'3153124252',group:'Listado 2',status:'unpaid'},
+{id:'b20',n:20,parent:'sol ángel bohorquez',student:'Briana Díaz',phone:'323 5703565',group:'Listado 2',status:'paid'},
+{id:'b21',n:21,parent:'Lilia jimenez',student:'lorielys liliana chacon',phone:'301 3499921',group:'Listado 2',status:'paid'}
+];
+const KEY='controlPagosComunionV1'; let people;
+try{people=JSON.parse(localStorage.getItem(KEY))||initial.map(x=>({...x}))}catch(e){people=initial.map(x=>({...x}))}
+let activeFilter='all';
+const money=n=>new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(n);
+const statusText=s=>s==='paid'?'PAGADO':s==='unpaid'?'NO PAGADO':'POR VERIFICAR';
+function save(){try{localStorage.setItem(KEY,JSON.stringify(people))}catch(e){}render()}
+function render(){
+ const paid=people.filter(p=>p.status==='paid').length, unpaid=people.filter(p=>p.status==='unpaid').length;
+ document.getElementById('total').textContent=people.length;
+ document.getElementById('paid').textContent=paid;
+ document.getElementById('pending').textContent=unpaid+people.filter(p=>p.status==='unknown').length;
+ document.getElementById('paidmoney').textContent=money(paid*35000)+' recaudados';
+ document.getElementById('pendingmoney').textContent=money((unpaid+people.filter(p=>p.status==='unknown').length)*35000)+' pendientes*';
+ const normalize = value => String(value || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLocaleLowerCase('es').trim();
+ const q=normalize(document.getElementById('search').value);
+ const filtered=people.filter(p=>(activeFilter==='all'||p.status===activeFilter)&&normalize([p.parent,p.student,p.phone,p.group].join(' ')).includes(q));
+ document.getElementById('resultCount').textContent=`${filtered.length} resultado${filtered.length===1?'':'s'}`;
+ const list=document.getElementById('list');
+ if(!filtered.length){list.innerHTML='<div class="panel empty">No encontramos coincidencias.<br>Prueba con otro nombre o apellido.</div>';return}
+ list.innerHTML=filtered.map(p=>`<article class="person">
+ <div class="person-top"><div class="number">${p.n||'—'}</div><div class="details"><p class="student">${esc(p.student)}</p><div class="parent">Acudiente: ${esc(p.parent)}</div><span class="group">${esc(p.group)}</span></div><span class="status ${p.status}">${statusText(p.status)}</span></div>
+ <div class="meta"><div class="phone">${p.phone?'☎ '+esc(p.phone):'☎ Sin número registrado'}</div><div class="amount ${p.status==='paid'?'':'muted'}">${p.status==='paid'?'$35.000 COP':p.status==='unpaid'?'Debe $35.000':'$35.000 por confirmar'}</div></div>
+ <div class="actions"><button onclick="toggleStatus('${p.id}')">${p.status==='paid'?'Marcar pendiente':'Marcar pagado'}</button><button onclick="editPerson('${p.id}')">Editar datos</button></div></article>`).join('');
+}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toggleStatus(id){const p=people.find(x=>x.id===id);if(!p)return;p.status=p.status==='paid'?'unpaid':'paid';save()}
+function editPerson(id){const p=people.find(x=>x.id===id);if(!p)return;document.getElementById('dialogTitle').textContent='Editar estudiante';document.getElementById('editId').value=p.id;document.getElementById('fStudent').value=p.student;document.getElementById('fParent').value=p.parent;document.getElementById('fPhone').value=p.phone;document.getElementById('fGroup').value=p.group;document.getElementById('fStatus').value=p.status;document.getElementById('editDialog').showModal()}
+document.getElementById('search').addEventListener('input',render);
+document.querySelectorAll('.filter').forEach(b=>b.addEventListener('click',()=>{activeFilter=b.dataset.filter;document.querySelectorAll('.filter').forEach(x=>x.classList.toggle('active',x===b));render()}));
+document.getElementById('addBtn').onclick=()=>{document.getElementById('studentForm').reset();document.getElementById('dialogTitle').textContent='Agregar estudiante';document.getElementById('editId').value='';document.getElementById('editDialog').showModal()};
+document.getElementById('cancelBtn').onclick=()=>document.getElementById('editDialog').close();
+document.getElementById('studentForm').addEventListener('submit',e=>{e.preventDefault();const id=document.getElementById('editId').value;const data={student:document.getElementById('fStudent').value.trim(),parent:document.getElementById('fParent').value.trim(),phone:document.getElementById('fPhone').value.trim(),group:document.getElementById('fGroup').value,status:document.getElementById('fStatus').value};if(id){Object.assign(people.find(p=>p.id===id),data)}else{const same=people.filter(p=>p.group===data.group);people.push({id:'new'+Date.now(),n:Math.max(0,...same.map(p=>Number(p.n)||0))+1,...data})}document.getElementById('editDialog').close();save()});
+document.getElementById('exportBtn').onclick=()=>{const rows=[['N°','Acudiente','Estudiante','WhatsApp','Listado','Estado','Valor'],...people.map(p=>[p.n,p.parent,p.student,p.phone,p.group,statusText(p.status),p.status==='paid'?35000:p.status==='unpaid'?0:'Por verificar'])];const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='control_pagos_primera_comunion.csv';a.click();URL.revokeObjectURL(url)};
+document.getElementById('resetBtn').onclick=()=>{if(confirm('¿Restaurar los datos originales de las imágenes? Se perderán los cambios guardados.')){people=initial.map(p=>({...p}));save()}};
+render();
+</script>
+</body></html>
